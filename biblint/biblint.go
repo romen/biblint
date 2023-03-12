@@ -4,11 +4,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/Kingsford-Group/biblint/bib"
 	"log"
 	"os"
 	"sort"
 	"strings"
+
+	"github.com/Kingsford-Group/biblint/bib"
 )
 
 const version = "v0.4"
@@ -124,7 +125,7 @@ func doClean(c *subcommand) bool {
 	db.ConvertIntStringsToInt()
 	db.ReplaceSymbols()
 	db.ReplaceAbbrMonths()
-	db.RemoveNonBlessedFields(blessedArr)
+	//db.RemoveNonBlessedFields(blessedArr)
 	db.RemoveEmptyFields()
 	db.ReplaceAuthorEtAl()
 	db.NormalizeAuthors()
@@ -148,6 +149,8 @@ func doClean(c *subcommand) bool {
 
 // doCheck runs the check command.
 func doCheck(c *subcommand) bool {
+	skipLoneHyphenInTitleCheck := c.flags.Bool("skip-lone-hyphen-in-title", false, "skip the check for lone hyphens in titles")
+
 	if !startSubcommand(c) {
 		return false
 	}
@@ -160,7 +163,9 @@ func doCheck(c *subcommand) bool {
 	db.CheckYearsAreInt()
 	db.CheckEtAl()
 	db.CheckASCII()
-	db.CheckLoneHyphenInTitle()
+	if !*skipLoneHyphenInTitleCheck {
+		db.CheckLoneHyphenInTitle()
+	}
 	db.CheckPageRanges()
 	db.CheckUndefinedSymbols()
 	db.CheckDuplicateKeys()
